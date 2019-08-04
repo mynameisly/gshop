@@ -8,31 +8,39 @@
           <span class="header_login" slot="right">
             <span class="header_login_text">登录|注册</span>
           </span>
+          <span class="header_login_text">
+            <i class="iconfont icon-person"></i>
+          </span>
         </HeaderTop>
-        <!--首页导航-->
-        <nav class="msite_nav">
-          <div class="swiper-container">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
-                <a href="javascript:" class="link_to_food" v-for="(catetory,index) in categorys" :key="index">
-                  <div class="food_container">
-                    <img :src="baseImageUrl + category.image_url">
+        <div class="miste-content-wrapper">
+          <div class="miste-content">
+            <!--首页导航-->
+            <nav class="msite_nav">
+              <div class="swiper-container" v-if="categorys.length">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide" v-for="(categorys, index) in categorysArr" :key="index">
+                    <a href="javascript:" class="link_to_food" v-for="(category, index) in categorys" :key="index">
+                      <div class="food_container">
+                        <img :src="baseImageUrl+category.image_url">
+                      </div>
+                      <span>{{category.title}}</span>
+                    </a>
                   </div>
-                  <span>{{category.title}}</span>
-                </a>
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
               </div>
+            </nav> 
+
+            <!--首页附近商家-->
+            <div class="msite_shop_list">
+              <div class="shop_header">
+                <i class="iconfont icon-xuanxiang"></i>
+                <span class="shop_header_title">附近商家</span>
+              </div>
+              <ShopList></ShopList>
             </div>
-            <!-- Add Pagination -->
-            <div class="swiper-pagination"></div>
           </div>
-        </nav>
-        <!--首页附近商家-->
-        <div class="msite_shop_list">
-          <div class="shop_header">
-            <i class="iconfont icon-xuanxiang"></i>
-            <span class="shop_header_title">附近商家</span>
-          </div>
-          <ShopList></ShopList>
         </div>
       </section>
 </template>
@@ -43,6 +51,7 @@ import Swiper from 'swiper'
 import 'swiper/dist/css/swiper.min.css'
 import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
 import ShopList from '../../components/ShopList/ShopList.vue'
+
 export default {
     data () {
       return{
@@ -50,16 +59,10 @@ export default {
       }
     },
     mounted(){
-
-      this.$store.dispatch('getCategorys')
-
-      new Swiper('swiper-container',{
-        loop:true,
-        // 如果需要分页器
-        pagination: {
-          el: '.swiper-pagination',
-        }
-      })
+      //发请求
+      this.$store.dispatch('getCategorys');
+      //不一定要在ShopList里面发，也可以在这里发
+      this.$store.dispatch('getShops');
     },
 
     computed:{
@@ -83,7 +86,7 @@ export default {
             minArr = []
           }
 
-          //如果minArr是空的，将小数组保存到大叔组中
+          //如果minArr是空的，将小数组保存到大数组中
           if(minArr.length === 0){
             arr.push(minArr)
           }
@@ -92,6 +95,32 @@ export default {
            minArr.push(c)
         })
         return arr
+      }
+    },
+
+    watch:{
+      categorys (value) {//数组中有数据了才有轮播
+      //使用setTimeout可以实现效果，但是不太好
+        // setTimeout(() => {
+        //   new Swiper('swiper-container',{
+        //     loop:true,
+        //     // 如果需要分页器
+        //     pagination: {
+        //       el: '.swiper-pagination',
+        //     }
+        //   })
+        // },100)
+
+
+        //我希望界面更新就立即创建Swiper对象
+        this.$nextTick(()=>{//这个方法可以实现
+          new Swiper('.swiper-container',{
+            loop:true,
+            pagination:{
+              el:'.swiper-pagination'
+            },
+          })
+        })
       }
     },
 
