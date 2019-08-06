@@ -9,7 +9,7 @@
           </div>
         </div>
         <div class="login_content">
-          <form @submit="login">
+          <form @submit.prevent="login">
             <div :class="{on:loginWay}" >
               <section class="login_message">
                 <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
@@ -40,7 +40,7 @@
                 </section>
                 <section class="login_message">
                   <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                  <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                  <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha" ref="captcha" @click="getCaptcha">
                 </section>
               </section>
             </div>
@@ -57,10 +57,11 @@
 </template>
 <script>
 import AlertTips from '../../components/AlertTips/AlertTips.vue'
+import {reqSendCode, reqSmsLogin, reqPwdLogin} from '../../api'
 export default {
     data () {
       return {
-        loginWay:true,//true代表短信登录，false代表密码登录
+        loginWay:false,//true代表短信登录，false代表密码登录
         computeTime : 0,//计时的时间
         showPwd:false,//是否显示密码
         phone:'',//手机号
@@ -69,7 +70,7 @@ export default {
         pwd:'',//密码
         captcha:'',//图形验证码
         textAlert:'',//提示文本
-        alertShow:'',//是否显示警告框
+        alertShow:false,//是否显示警告框
       }
     },
     computed:{
@@ -79,7 +80,7 @@ export default {
     },
     methods: {
       // 异步获取短信验证码
-      getCode(){
+      async getCode(){
         //启动倒计时
         //如果当前没有计时
         if(!this.computeTime){
@@ -91,7 +92,19 @@ export default {
               clearInterval(this.intervarId)
             }
           },1000)
+
           //发送Ajax请求
+          const result = await reqSendCode(this.phone)
+          if(result.code === 1){
+            //显示提示
+            this.showAlert(result.msg)
+            //停止计时
+            if(this.computeTime){
+              this.computeTime = 0
+              clearInterval(this.intervarId)
+              this.intervarId = undefined
+            }
+          }
         }
       },
 
@@ -101,35 +114,77 @@ export default {
       },
 
       //异步登录
-      login(){
+      async login(){
         // 前台表单验证
+        let result
         if(this.loginWay){//短信登录
           const {rightPhone, phone,code} = this
           if(!this.rightPhone){
             //手机号码不正确
             this.showAlert('手机号码不正确')
+            return
           } else if(!/^\d{6}$/.test(code)){
             //验证码必须是6位
             this.showAlert('验证码必须是6位')
+            return
           }
+
+          //发送Ajax进行短信登录 测试的手机号码为13716962779 在cmd命令窗口可以查看验证码
+          result = await reqSmsLogin(phone, code)
+          
+
         } else { //密码登录
           const {name, pwd , captcha} = this
           if(!this.name) {
             //用户名必须指定
             this.showAlert('用户名必须指定')
+            return
           } else if(!this.pwd){
             //密码必须指定
             this.showAlert('密码必须指定')
+            return
           } else if(!this.captcha){
             //验证码必须指定
             this.showAlert('验证码必须指定')
+            return
           }
-        }
-      },
 
+          //发送Ajax请求进行密码登录
+          result = await reqPwdLogin({name, pwd, captcha})
+      
+        }
+
+        //停止计时
+        if(this.computeTime){
+          this.computeTime = 0
+          clearInterval(this.intervarId)
+          this.intervarId = undefined
+        }
+
+        //根据结果数据处理
+        if(result.code === 0){
+          const user = result.data
+          //将user保存到vuex的state
+          this.$store.dispatch('recordUser', user)
+          //去个人中心界面
+          this.$router.replace('/profile')
+        } else {
+          //点击登录后更新图形验证码
+          this.getCaptcha()
+          //显示提示信息
+          const msg = result.msg
+          this.showAlert(msg)
+        }
+
+      },
+      //关闭弹出框
       closeTip(){
         this.alertShow = false
         this.textAlert = ''
+      },
+      //获取一个新的图形验证码
+      getCaptcha(){
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time='+Date.now()
       }
     },
     components:{

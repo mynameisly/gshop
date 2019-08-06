@@ -41,7 +41,7 @@
         </li>
       </ul>
       <ul v-else>
-        <li item in 6>
+        <li v-for="item in 6" :key="item">
           <img src="./images/shop_back.svg" alt="back">
         </li>
       </ul>

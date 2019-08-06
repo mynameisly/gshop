@@ -35,7 +35,7 @@ module.exports = {
       }
     },
     host:'localhost',
-    port: 8081,
+    port: 8080,
     autoOpenBrowser: true,
     // errorOverlay:true,
     // notifyOnErrors:true,

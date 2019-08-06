@@ -28,7 +28,6 @@
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   @import '../../common/stylus/mixins.styl';
-
   @keyframes tipMove
     0%
       transform: scale(1)
