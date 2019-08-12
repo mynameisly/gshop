@@ -3,22 +3,24 @@
         <ShopHeader/>
         <div class="tab">
             <div class="tab_item">
-                <router-link to="/shop/goods">
+                <router-link to="/shop/goods" replace>
                     点餐
                 </router-link>
             </div>
             <div class="tab_item">
-                <router-link to="/shop/ratings">
+                <router-link to="/shop/ratings" replace>
                     评价
                 </router-link>
             </div>
             <div class="tab_item">
-                <router-link to="/shop/info">
+                <router-link to="/shop/info" replace>
                     商家
                 </router-link>
             </div>
         </div>
-        <router-view></router-view>
+        <keep-alive>
+            <router-view/>
+        </keep-alive>
     </div>
 </template>
 <script>
@@ -33,7 +35,7 @@ export default {
 }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
-  @import "../../common/stylus/mixins.styl"
+@import "../../common/stylus/mixins.styl"
   .tab
     height 40px
     line-height 40px
@@ -41,7 +43,7 @@ export default {
     bottom-border-1px(rgba(7, 17, 27, 0.1))
     .tab-item
       float left
-      width: 33.33333%
+      width 33.33333%
       text-align center
       font-size 14px
       color rgb(77, 85, 93)
