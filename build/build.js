@@ -10,6 +10,10 @@ var webpack = require('webpack')
 var config = require('../config')
 var webpackConfig = require('./webpack.prod.conf')
 
+
+const uglify = require('uglify-js')
+
+
 var spinner = ora('building for production...')
 spinner.start()
 

@@ -8,9 +8,9 @@
           <span class="header_login" slot="right">
             <span class="header_login_text">登录|注册</span>
           </span>
-          <span class="header_login_text">
+          <!-- <span class="header_login_text">
             <i class="iconfont icon-person"></i>
-          </span>
+          </span> -->
         </HeaderTop>
         <div class="miste-content-wrapper">
           <div class="miste-content">

@@ -4,7 +4,7 @@
         <li class="shop_li border-1px" v-for="(shop, index) in shops" :key="index" @click="$router.push('/shop')">
           <a>
             <div class="shop_left">
-              <img class="shop_img" :src="baseImgUrl+shop.image_path">
+              <img class="shop_img" :src="shop.image_path">
             </div>
             <div class="shop_right">
               <section class="shop_detail_header">
@@ -53,7 +53,7 @@ import Star from '../Star/Star.vue'
 export default {
     data(){
       return {
-        baseImgUrl:'http://cangdu.org:8001/img/'
+        // baseImgUrl:'http://cangdu.org:8001/img/'
       }
     },
     computed:{
